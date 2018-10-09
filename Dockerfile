@@ -6,8 +6,10 @@ WORKDIR /app
 
 # Add libraries
 RUN apk add --no-cache git && \
-  go get "github.com/namsral/flag" && \
-  go get "github.com/op/go-logging" && \
+  go get "github.com/coreos/go-oidc" && \
+  go get "github.com/gorilla/sessions" && \
+  go get "golang.org/x/net/context" && \
+  go get "golang.org/x/oauth2" && \
   apk del git
 
 # Copy & build
