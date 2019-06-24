@@ -19,6 +19,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /traefik-dex-au
 # Copy into scratch container
 FROM scratch
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /traefik-dex-auth ./
-ENTRYPOINT ["./traefik-dex-auth"]
+COPY --from=builder /traefik-dex-auth /
+ENTRYPOINT ["/traefik-dex-auth"]
 

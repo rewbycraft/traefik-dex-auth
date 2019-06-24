@@ -43,7 +43,7 @@ func main() {
 	store := sessions.NewCookieStore([]byte(RandStringBytes(16)))
 	sessionName := RandStringBytes(16)
 
-	store.Options.Domain = *cookieDomainPtr;
+	store.Options.Domain = *cookieDomainPtr
 
 	ctx := context.Background()
 
@@ -69,6 +69,12 @@ func main() {
 		session.Values["forwarded-uri"] = r.Header.Get("X-Forwarded-Uri")
 		session.Values["forwarded-host"] = r.Header.Get("X-Forwarded-Host")
 		session.Values["forwarded-proto"] = r.Header.Get("X-Forwarded-Proto")
+		keys, ok := r.URL.Query()["group"]
+		if !ok || len(keys[0]) < 1 {
+			session.Values["group"] = *groupPtr
+		} else {
+			session.Values["group"] = string(keys[0])
+		}
 		session.Save(r, w)
 
 		//Parse and verify ID Token payload.
@@ -108,16 +114,21 @@ func main() {
 			return
 		}
 
-		if *groupPtr != "" {
-			//Check if required group exists
-			sort.Strings(claims.Groups)
+		val = session.Values["group"]
 
-			i := sort.SearchStrings(claims.Groups, *groupPtr)
+		if val != nil {
+			group, ok := val.(string)
+			if ok && group != "" {
+				//Check if required group exists
+				sort.Strings(claims.Groups)
 
-			if (i >= len(claims.Groups)) || (claims.Groups[i] != *groupPtr) {
-				http.Error(w, http.StatusText(http.StatusInternalServerError),
-					http.StatusInternalServerError)
-				return
+				i := sort.SearchStrings(claims.Groups, group)
+
+				if (i >= len(claims.Groups)) || (claims.Groups[i] != group) {
+					http.Error(w, http.StatusText(http.StatusInternalServerError),
+						http.StatusInternalServerError)
+					return
+				}
 			}
 		}
 
@@ -169,19 +180,25 @@ func main() {
 			return
 		}
 
-		if *groupPtr != "" {
-			sort.Strings(claims.Groups)
+		val := session.Values["group"]
 
-			i := sort.SearchStrings(claims.Groups, *groupPtr)
+		if val != nil {
+			group, ok := val.(string)
+			if ok && group != "" {
+				//Check if required group exists
+				sort.Strings(claims.Groups)
 
-			if (i >= len(claims.Groups)) || (claims.Groups[i] != *groupPtr) {
-				http.Error(w, http.StatusText(http.StatusInternalServerError),
-					http.StatusInternalServerError)
-				return
+				i := sort.SearchStrings(claims.Groups, group)
+
+				if (i >= len(claims.Groups)) || (claims.Groups[i] != group) {
+					http.Error(w, http.StatusText(http.StatusInternalServerError),
+						http.StatusInternalServerError)
+					return
+				}
 			}
 		}
 
-		val := session.Values["forwarded-uri"]
+		val = session.Values["forwarded-uri"]
 
 		if val == nil {
 			//No forwarded uri, just say Ok.
