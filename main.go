@@ -125,8 +125,8 @@ func main() {
 				i := sort.SearchStrings(claims.Groups, group)
 
 				if (i >= len(claims.Groups)) || (claims.Groups[i] != group) {
-					http.Error(w, http.StatusText(http.StatusInternalServerError),
-						http.StatusInternalServerError)
+					http.Error(w, http.StatusText(http.StatusUnauthorized),
+						http.StatusUnauthorized)
 					return
 				}
 			}
@@ -191,8 +191,8 @@ func main() {
 				i := sort.SearchStrings(claims.Groups, group)
 
 				if (i >= len(claims.Groups)) || (claims.Groups[i] != group) {
-					http.Error(w, http.StatusText(http.StatusInternalServerError),
-						http.StatusInternalServerError)
+					http.Error(w, http.StatusText(http.StatusUnauthorized),
+						http.StatusUnauthorized)
 					return
 				}
 			}
